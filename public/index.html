@@ -36,14 +36,19 @@
 
 <body>
   <header>
-    <h1>Managing Recipes</h1>
-    <h4>CRUD: a full data lifecycle (Recipes)</h4>
+    <h1>GYM CHEF</h1>
+    <!-- <h4>CRUD: a full data lifecycle (Recipes)</h4> -->
   </header>
   <section id="status">
     <p id="readyStatus">✅ MongoDB is Ready</p>
     <p id="notReadyStatus">❌ MongoDB is not connected. Please check your connection string in <code>.env</code> file.
     </p>
   </section>
+  <div class="type-filters" style="margin: 1rem 0;">
+    <button id="filterAll" class="active">ALL</button>
+    <button id="filterDrinks">DRINKS</button>
+    <button id="filterMeals">MEALS</button>
+  </div>
   <button
     id="createButton"
     popovertarget="formPopover"
@@ -77,15 +82,25 @@
       </fieldset>
 
       <fieldset>
+        <label for="description">Notes / Description</label>
+        <small>Optional additional notes</small>
+        <textarea
+          placeholder="Optional notes about the recipe"
+          name="description"
+          id="description"
+          rows="3"
+          cols="30"
+        ></textarea>
+      </fieldset>
+
+
+
+      <fieldset>
         <label for="type">Type</label>
         <select name="type" id="type">
           <option value="" disabled selected>Select type</option>
-          <option value="Breakfast">Breakfast</option>
-          <option value="Lunch">Lunch</option>
-          <option value="Dinner">Dinner</option>
-          <option value="Dessert">Dessert</option>
-          <option value="Snack">Snack</option>
-          <option value="Other">Other</option>
+          <option value="drink">Drink</option>
+          <option value="meal">Meal</option>
         </select>
       </fieldset>
 
@@ -139,7 +154,7 @@
         ></textarea>
       </fieldset>
 
-      <fieldset>
+      <!-- <fieldset>
         <label for="description">Notes / Description</label>
         <small>Optional additional notes</small>
         <textarea
@@ -149,7 +164,7 @@
           rows="3"
           cols="30"
         ></textarea>
-      </fieldset>
+      </fieldset> -->
 
       <fieldset>
         <button class="save">Save</button>
@@ -169,7 +184,7 @@
   </main>
 
   <section id="intro">
-    <h3>About</h3>
+    <!-- <h3>About</h3>
     <p>Previously we explored approaches to <a
         href="https://github.com/ixd-system-design/API-Endpoints-for-Publishing-and-Searching"
       >Publishing Data</a> and <a href="https://github.com/ixd-system-design/Collecting-Data">Collecting Data</a> by
@@ -211,7 +226,7 @@
   <footer>
     Created by <a href="https://nsitu.ca">Harold Sikkema</a> in the context of
     Systems Design in the Interaction Design program at Sheridan College.
-  </footer>
+  </footer> -->
 
   <script
     src="script.js"

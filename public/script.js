@@ -6,6 +6,28 @@ let formPopover = document.querySelector('#formPopover')
 let createButton = document.querySelector('#createButton')
 let formHeading = document.querySelector('#formPopover h2')
 
+// Polyfill / fallback for popover methods in browsers that don't support the Popover API
+if (formPopover) {
+    if (typeof formPopover.showPopover !== 'function') {
+        formPopover.showPopover = function () {
+            this.classList.add('open')
+            // simple backdrop using body class
+            document.body.classList.add('popover-open')
+        }
+    }
+    if (typeof formPopover.hidePopover !== 'function') {
+        formPopover.hidePopover = function () {
+            this.classList.remove('open')
+            document.body.classList.remove('popover-open')
+        }
+    }
+
+    // Wire elements that use popovertargetaction="hide" to call hidePopover
+    document.querySelectorAll('[popovertargetaction="hide"]').forEach(el => {
+        el.addEventListener('click', () => formPopover.hidePopover())
+    })
+}
+
 // Get form data and process each type of input
 // Prepare the data as JSON with a proper set of types
 // e.g. Booleans, Numbers, Dates
@@ -115,7 +137,7 @@ const editItem = (data) => {
     })
 
     // Update the heading to indicate edit mode
-    formHeading.textContent = '🐈 Edit Cat'
+    formHeading.textContent = '🍲 Edit Recipe'
 
     // Show the popover
     formPopover.showPopover()
@@ -123,7 +145,7 @@ const editItem = (data) => {
 
 // Delete item
 const deleteItem = async (id) => {
-    if (!confirm('Are you sure you want to delete this cat?')) {
+    if (!confirm('Are you sure you want to delete this recipe?')) {
         return
     }
 
@@ -170,60 +192,41 @@ const renderItem = (item) => {
     div.classList.add('item-card')
     div.setAttribute('data-id', item.id)
 
+    // Prepare ingredients list (comma-separated string in DB)
+    const ingredientsHtml = item.ingredients ? `<ul>${item.ingredients.split(',').map(i => `<li>${i.trim()}</li>`).join('')}</ul>` : ''
+    const stepsHtml = item.steps ? `<pre class="steps">${item.steps}</pre>` : ''
+
     const template = /*html*/`  
     <div class="item-heading">
-        <h3> ${item.name} </h3>
-        <div class="microchip-info">
-            <img src="./assets/chip.svg" /> ${item.microchip || '<i>???</i>'} 
-        </div>  
+        <h3>${item.title || '<i>Untitled</i>'}</h3>
+        <div class="meta">
+            <span class="type">${item.type || ''}</span>
+            <span class="calories">${item.calories != null ? item.calories + ' kcal' : ''}</span>
+            <span class="protein">${item.proteinGrams != null ? item.proteinGrams + ' g protein' : ''}</span>
+        </div>
     </div>
-    <div class="item-info"> 
-        <div class="item-icon" style="
-            background: linear-gradient(135deg, 
-            ${item.primaryColor} 0%, 
-            ${item.primaryColor} 40%, 
-            ${item.secondaryColor} 60%, 
-            ${item.secondaryColor} 100%); 
-        ">
-        </div> 
-        <div class="stats">
-            <div class="stat">
-                <span>Playfulness</span>
-                <meter max="10" min="0" value="${item.playfulness || 0}"></meter> 
-            </div>
-            <div class="stat">
-                <span>Appetite</span>
-                <meter max="10" min="0" value="${item.appetite || 0}"></meter> 
-            </div>
-        </div> 
-            
-         ${calendarWidget(item.birthDate)}
-    </div>
-        
-    <div class="item-info">  
-        <section class="breed" style="${item.breed ? '' : 'display:none;'}">  
-            <img src="./assets/ribbon.svg" />  ${item.breed}
+    <div class="item-info">
+        <section class="ingredients" style="${item.ingredients ? '' : 'display:none;'}">
+            <h4>Ingredients</h4>
+            ${ingredientsHtml}
         </section>
-        <section class="food" style="${item.food ? '' : 'display:none;'}">
-             <img src="./assets/${item.food}.svg" /> <span>${item.food} food</span>
-        </section> 
-        <section class="adoption">
-            <img src="./assets/${item.isAdopted ? 'adopted' : 'paw'}.svg" />
-            ${item.isAdopted ? 'Adopted' : 'Available'}
-        </section> 
     </div>
 
-    <section class="description" style="${item.description ? '' : 'display:none;'}">  
-        <p>${item.description}</p>
+    <section class="steps" style="${item.steps ? '' : 'display:none;'}">
+        <h4>Steps</h4>
+        ${stepsHtml}
     </section>
 
-        
-           
-        <div class="item-actions">
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-        </div>
+    <section class="description" style="${item.description ? '' : 'display:none;'}">
+        <p>${item.description || ''}</p>
+    </section>
+
+    <div class="item-actions">
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+    </div>
     `
+
     div.innerHTML = DOMPurify.sanitize(template);
 
     // Add event listeners to buttons
@@ -272,10 +275,13 @@ const getData = async () => {
 }
 
 // Revert to the default form title on reset
-myForm.addEventListener('reset', () => formHeading.textContent = '🐈 Share a Cat')
+myForm.addEventListener('reset', () => formHeading.textContent = '🍲 Share a Recipe')
 
 // Reset the form when the create button is clicked. 
-createButton.addEventListener('click', myForm.reset())
+createButton.addEventListener('click', () => {
+    myForm.reset()
+    formPopover.showPopover()
+})
 
 // Load initial data
 getData()

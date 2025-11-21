@@ -111,11 +111,37 @@ button.cancel:hover {
     border-radius: 1rem;
     box-shadow: 0 0 2rem rgba(0, 0, 0, 0.3);
     margin: auto;
-
+    /* hidden by default for browsers without native popover support */
+    display: none;
+    background: white;
+    z-index: 1001;
+    position: relative;
 }
 
 #formPopover::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* visible state when .open is added (used by the JS fallback) */
+#formPopover.open {
+    display: block;
+    position: fixed;
+    left: 50%;
+    top: 10%;
+    transform: translateX(-50%);
+    max-width: 90vw;
+}
+
+/* simple page-level backdrop controlled by body class */
+body.popover-open::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
 }
 
 /* Create button */

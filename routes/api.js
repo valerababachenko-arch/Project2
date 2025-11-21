@@ -3,8 +3,8 @@
 import express from 'express'
 const router = express.Router()
 
-// Set this to match the model name in your Prisma schema
-const model = 'cats'
+// Use the Prisma model for recipes
+// The Prisma client exposes the model as `prisma.recipes`
 
 // Prisma lets NodeJS communicate with MongoDB
 // Let's import and initialize the Prisma client
@@ -28,7 +28,7 @@ router.post('/data', async (req, res) => {
         // MongoDB will auto-generate an ID for new records
         const { id, ...createData } = req.body
 
-        const created = await prisma[model].create({
+        const created = await prisma.recipes.create({
             data: createData
         })
         res.status(201).send(created)
@@ -43,7 +43,7 @@ router.post('/data', async (req, res) => {
 router.get('/data', async (req, res) => {
     try {
         // fetch first 100 records from the database with no filter
-        const result = await prisma[model].findMany({
+        const result = await prisma.recipes.findMany({
             take: 100
         })
         res.send(result)
@@ -63,14 +63,14 @@ router.get('/search', async (req, res) => {
         // get search terms from query string, default to empty string
         const searchTerms = req.query.terms || ''
         // fetch the records from the database
-        const result = await prisma[model].findMany({
+        const result = await prisma.recipes.findMany({
             where: {
-                name: {
+                title: {
                     contains: searchTerms,
                     mode: 'insensitive'  // case-insensitive search
                 }
             },
-            orderBy: { name: 'asc' },
+            orderBy: { title: 'asc' },
             take: 10
         })
         res.send(result)
@@ -93,7 +93,7 @@ router.put('/data/:id', async (req, res) => {
         const { id, ...updateData } = req.body
 
         // Prisma update returns the updated version by default
-        const updated = await prisma[model].update({
+        const updated = await prisma.recipes.update({
             where: { id: req.params.id },
             data: updateData
         })
@@ -110,7 +110,7 @@ router.put('/data/:id', async (req, res) => {
 // This is the 'D' of CRUD
 router.delete('/data/:id', async (req, res) => {
     try {
-        const result = await prisma[model].delete({
+        const result = await prisma.recipes.delete({
             where: { id: req.params.id }
         })
         res.send(result)
